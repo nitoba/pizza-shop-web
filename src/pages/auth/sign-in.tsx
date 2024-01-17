@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, LogIn } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -46,7 +47,18 @@ export function SignInPage() {
     <>
       <Helmet title="Sign In" />
       <div className="p-8">
-        <div className="flex w-[320px] flex-col justify-center gap-6">
+        <Button
+          asChild
+          className="absolute right-4 top-4 gap-2"
+          variant="outline"
+        >
+          <Link to="/sign-up">
+            Novo estabelecimento
+            <LogIn className="size-4" />
+          </Link>
+        </Button>
+
+        <div className="mx-auto flex w-[90%] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
               Acessar o painel
