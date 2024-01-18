@@ -57,23 +57,27 @@ export function StoreProfileDialog() {
     },
   })
 
+  function updateCachedProfile({ name, description }: FormSchemaValues) {
+    queryClient.setQueryData<GetManagedRestaurantResponse>(
+      ['managed-restaurant'],
+      (cached) => {
+        if (cached) {
+          return {
+            ...cached,
+            name,
+            description,
+          }
+        }
+      },
+    )
+  }
+
   async function onSubmit({ name, description }: FormSchemaValues) {
     try {
       await handleUpdateProfile({ name, description })
       toast.success('Perfil atualizado com sucesso!')
       //   Update the cached data instead to do another request to backend
-      queryClient.setQueryData<GetManagedRestaurantResponse>(
-        ['managed-restaurant'],
-        (cached) => {
-          if (cached) {
-            return {
-              ...cached,
-              name,
-              description,
-            }
-          }
-        },
-      )
+      updateCachedProfile({ name, description })
     } catch (e) {
       toast.error('Erro ao atualizar o perfil, tente novamente')
     }
