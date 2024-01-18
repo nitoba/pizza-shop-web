@@ -1,8 +1,10 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { RouterProvider } from 'react-router-dom'
 
 import { ThemeProvider } from './components/theme/theme-provider'
 import { Toaster } from './components/ui/sonner'
+import { client } from './lib/react-query'
 import { router } from './routes'
 
 export function App() {
@@ -10,7 +12,9 @@ export function App() {
     <ThemeProvider storageKey="pizzashop-theme" defaultTheme="dark">
       <HelmetProvider>
         <Helmet titleTemplate="%s | Pizza.Shop" />
-        <RouterProvider router={router} />
+        <QueryClientProvider client={client}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
         <Toaster closeButton richColors />
       </HelmetProvider>
     </ThemeProvider>

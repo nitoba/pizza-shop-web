@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { Loader2, LogIn } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { signIn } from '@/api/sign-in'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -24,21 +26,34 @@ const formSchema = z.object({
 type FormSchemaValues = z.infer<typeof formSchema>
 
 export function SignInPage() {
-  const form = useForm<FormSchemaValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
+  const [searchParams] = useSearchParams()
+
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: signIn,
+    onSettled(_, error) {
+      if (error) {
+        toast.error('Erro ao se autenticar!', {
+          description: 'Credenciais incorretas!',
+        })
+      } else {
+        toast.success('Uhul!', {
+          description: 'Enviamos um link de autenticação para seu email.',
+        })
+      }
     },
   })
 
-  async function onSubmit(values: FormSchemaValues) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    toast.success('Uhul!', {
-      description: 'Enviamos um link de autenticação para seu email.',
-    })
+  const form = useForm<FormSchemaValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: searchParams.get('email') ?? '',
+    },
+  })
+
+  async function onSubmit({ email }: FormSchemaValues) {
+    try {
+      await authenticate({ email })
+    } catch (error) {}
   }
 
   const isSubmitting = form.formState.isSubmitting

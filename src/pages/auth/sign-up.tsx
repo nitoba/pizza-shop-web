@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { Loader2, LogIn } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
@@ -6,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { registerRestaurant } from '@/api/register-restaurant'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -35,19 +37,23 @@ export function SignUpPage() {
     },
   })
 
-  async function onSubmit(values: FormSchemaValues) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+  const { mutateAsync: register } = useMutation({
+    mutationFn: registerRestaurant,
+  })
 
-    toast.success('Uhul!', {
-      description: 'Restaurante cadastrado com sucesso!',
-      action: {
-        label: 'Login',
-        onClick: () => navigate('/sign-in'),
-      },
-    })
+  async function onSubmit(values: FormSchemaValues) {
+    try {
+      await register(values)
+      toast.success('Uhul!', {
+        description: 'Restaurante cadastrado com sucesso!',
+        action: {
+          label: 'Login',
+          onClick: () => navigate(`/sign-in?email=${values.email}`),
+        },
+      })
+    } catch (error) {
+      toast.error('Erro ao se registrar!')
+    }
   }
 
   const isSubmitting = form.formState.isSubmitting
