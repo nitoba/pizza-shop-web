@@ -7,11 +7,6 @@ export type Status =
   | 'delivering'
   | 'delivered'
 
-const orderStatusMap = {
-  status: '',
-  label: '',
-}
-
 export type Order = {
   orderId: string
   createdAt: string
@@ -31,13 +26,19 @@ export type GetOrdersResponse = {
 
 type GetOrdersQuery = {
   pageIndex?: number | null
-  costumerName?: string
-  status?: string
+  costumerName?: string | null
+  orderId?: string | null
+  status?: string | null
 }
 
-export async function getOrders({ pageIndex }: GetOrdersQuery) {
+export async function getOrders({
+  pageIndex,
+  costumerName,
+  orderId,
+  status,
+}: GetOrdersQuery) {
   const response = await api.get<GetOrdersResponse>('/orders', {
-    params: { pageIndex },
+    params: { pageIndex, costumerName, orderId, status },
   })
 
   return response.data
