@@ -1,16 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowRight, Loader2, Search, X } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
 
-import { cancelOrder } from '@/api/cancel-order'
-import { GetOrdersResponse, Order } from '@/api/get-orders'
+import { Order } from '@/api/get-orders'
 import { OrderStatus } from '@/components/order-status'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { useHandleChangeOrderStatus } from '@/hooks/use-handle-change-order-status'
 
 import { OrderDetails } from './order-details'
 
@@ -19,45 +17,12 @@ type Props = {
 }
 
 export function OrderTableRow({ order }: Props) {
-  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
 
-  const canCancelOrder = ['pending', 'processing'].includes(order.status)
-
-  const { mutateAsync, isPending: isCanceling } = useMutation({
-    mutationFn: cancelOrder,
-    onSuccess: (_, { orderId }) => {
-      queryClient.setQueriesData<GetOrdersResponse>(
-        { queryKey: ['orders'] },
-        (cached) => {
-          if (cached) {
-            return {
-              ...cached,
-              orders: cached.orders.map((orderCached) => {
-                if (orderCached.orderId === orderId) {
-                  return {
-                    ...orderCached,
-                    status: 'canceled',
-                  }
-                } else {
-                  return orderCached
-                }
-              }),
-            }
-          }
-        },
-      )
-    },
-  })
-
-  async function handleCancelOrder() {
-    try {
-      await mutateAsync({ orderId: order.orderId })
-      toast.success('Pedido cancelado com sucesso')
-    } catch (error) {
-      toast.error('Erro ao cancelar pedido, tente novamente!')
-    }
-  }
+  const { ActionStatusButton, CancelActionButton } = useHandleChangeOrderStatus(
+    order.orderId,
+    order.status,
+  )
 
   return (
     <TableRow>
@@ -93,22 +58,10 @@ export function OrderTableRow({ order }: Props) {
         })}
       </TableCell>
       <TableCell>
-        <Button variant="outline" size="xs">
-          <ArrowRight className="mr-2 size-3" />
-          Aprovar
-        </Button>
+        <ActionStatusButton status={order.status} />
       </TableCell>
       <TableCell>
-        <Button
-          variant="ghost"
-          size="xs"
-          disabled={!canCancelOrder || isCanceling}
-          onClick={handleCancelOrder}
-        >
-          <X className="mr-2 size-3" />
-          Cancelar
-          {isCanceling && <Loader2 className="ml-2 size-4 animate-spin" />}
-        </Button>
+        <CancelActionButton />
       </TableCell>
     </TableRow>
   )
