@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { subDays } from 'date-fns'
+import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import {
@@ -60,7 +61,7 @@ export function RevenueChart() {
       </CardHeader>
 
       <CardContent>
-        {dailyRevenue && (
+        {dailyRevenue ? (
           <ResponsiveContainer width="100%" height={240}>
             <LineChart style={{ fontSize: 12 }} data={chartData}>
               <XAxis
@@ -93,6 +94,10 @@ export function RevenueChart() {
               <CartesianGrid vertical={false} className="stroke-muted" />
             </LineChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="flex h-[240px] items-center justify-center">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
         )}
       </CardContent>
     </Card>

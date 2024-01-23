@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { BarChart } from 'lucide-react'
+import { BarChart, Loader2 } from 'lucide-react'
 import {
   CartesianGrid,
   Cell,
@@ -38,7 +38,7 @@ export function PopularProductsChart() {
       </CardHeader>
 
       <CardContent>
-        {popularProducts && (
+        {popularProducts ? (
           <ResponsiveContainer width="100%" height={240}>
             <PieChart style={{ fontSize: 12 }}>
               <Pie
@@ -98,6 +98,10 @@ export function PopularProductsChart() {
               <CartesianGrid vertical={false} className="stroke-muted" />
             </PieChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="flex h-[240px] items-center justify-center">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
         )}
       </CardContent>
     </Card>

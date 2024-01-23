@@ -21,12 +21,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { OrderDetailsSkeleton } from './order-details-skeleton'
+
 type Props = {
   orderId: string
 }
 
 export function OrderDetails({ orderId }: Props) {
-  const { data: orderDetails } = useQuery({
+  const { data: orderDetails, isLoading } = useQuery({
     queryKey: ['order-details', orderId],
     queryFn: () => getOrderDetails({ orderId }),
   })
@@ -37,6 +39,7 @@ export function OrderDetails({ orderId }: Props) {
 
   return (
     <DialogContent>
+      {isLoading && <OrderDetailsSkeleton />}
       {orderDetails && (
         <>
           <DialogHeader>
